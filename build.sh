@@ -5,4 +5,5 @@
 
 mkdir -p output
 cd output
-cmake .. -D FRIVOLOUS=EIEIO && make
+cmake .. -D FRIVOLOUS=EIEIO
+cmake --build . 

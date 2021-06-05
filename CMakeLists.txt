@@ -12,6 +12,8 @@ message(STATUS "Frivolous variable = ${FRIVOLOUS}")
 set(MAKE_LIBS OFF)
 message(STATUS "Make libraries? ${MAKE_LIBS}")
 
+message("C compiler flags: ${CMAKE_C_FLAGS}")
+
 # The main program
 add_executable(lale src/lale.c)
 
