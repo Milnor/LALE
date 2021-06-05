@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.17)
+
 project(LALE 
 	VERSION			0.1.0
 	DESCRIPTION		"do sth. with Win and Linux executables"
 	LANGUAGES		C
 )
+
+option(FRIVOLOUS "put whatever you want here" OFF)
+message(STATUS "Frivolous variable = ${FRIVOLOUS}")
+
+set(MAKE_LIBS OFF)
+message(STATUS "Make libraries? ${MAKE_LIBS}")
 
 # The main program
 add_executable(lale src/lale.c)
