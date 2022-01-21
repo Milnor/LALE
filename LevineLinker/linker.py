@@ -5,21 +5,35 @@
 import sys
 
 class ObjectFile:
-    def __init__(self, nseg, nsym, nrel):
-        self.n_segs = nseg
-        self.n_syms = nsym
-        self.n_rels = nrel
+    """ Class to hold an object file for dynamic linking """
+    def __init__(self, magic, nsegs, nsyms, nrels):
+        self.magic = magic
+        self.nsegs = nsegs
+        self.nsyms = nsyms
+        self.nrels = nrels
 
     def debug_me(self):
-        print("OBJ = {} {} {}".format(self.n_segs, self.n_syms, self.n_rels))
+        """ Display basic object info """
+        print("OBJ = {} {} {}".format(self.nsegs, self.nsyms, self.nrels))
 
-def link_like_levin(data):
+def link_like_levine(data):
     """ Parse an object file """
-    if data[0].strip() != 'LINK':
-        print("[-] Bad object format: magic", file=sys.stderr)
+    magic = ""
+    nsegs = 0
+    nsyms = 0
+    nrels = 0
+    try:
+        magic = data[0].strip()
+        if magic != 'LINK':
+            raise ValueError("Bad magic: {}, expected \'LINK\'".format(magic))
+        counts = data[1].split(" ")
+        nsegs = int(counts[0])
+        nsyms = int(counts[1])
+        nrels = int(counts[2])
+    except ValueError as bad_val:
+        print(bad_val, file=sys.stderr)
         sys.exit(1)
-    counts = data[1].split(" ")
-    obj_file = ObjectFile(counts[0], counts[1], counts[2])
+    obj_file = ObjectFile(magic, nsegs, nsyms, nrels)
     obj_file.debug_me()
 
 def main():
@@ -29,7 +43,7 @@ def main():
         sys.exit(0)
     try:
         with open(sys.argv[1], 'r') as obj:
-            link_like_levin(obj.readlines())
+            link_like_levine(obj.readlines())
     except FileNotFoundError:
         print("[-] Can't find {}".format(sys.argv[1]), file=sys.stderr)
         sys.exit(1)
