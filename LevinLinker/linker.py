@@ -4,9 +4,24 @@
 
 import sys
 
+class ObjectFile:
+    def __init__(self, nseg, nsym, nrel):
+        self.n_segs = nseg
+        self.n_syms = nsym
+        self.n_rels = nrel
+
+    def debug_me(self):
+        print("OBJ = {} {} {}".format(self.n_segs, self.n_syms, self.n_rels))
+
 def link_like_levin(data):
     """ Parse an object file """
-    magic = obj.readlines()
+    if data[0].strip() != 'LINK':
+        print("[-] Bad object format: magic", file=sys.stderr)
+        sys.exit(1)
+    counts = data[1].split(" ")
+    obj_file = ObjectFile(counts[0], counts[1], counts[2])
+    obj_file.debug_me()
+
 def main():
     """ Read in an object file and spit it back out """
     if len(sys.argv) < 2:
