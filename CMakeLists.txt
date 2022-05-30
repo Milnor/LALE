@@ -14,6 +14,8 @@ message(STATUS "Make libraries? ${MAKE_LIBS}")
 
 message("C compiler flags: ${CMAKE_C_FLAGS}")
 
+set(CMAKE_C_LANG_TIDY "clang-tidy;-checks=*")
+
 # The main program
 add_executable(lale src/lale.c)
 
