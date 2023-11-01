@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.22)
 
 project(LALE 
-	VERSION			0.1.0
-	DESCRIPTION		"do sth. with Win and Linux executables"
+	VERSION			0.1.1
+	DESCRIPTION		"Vivisect PE/ELF Executables"
 	LANGUAGES		C
 )
 
+#[=[
 option(FRIVOLOUS "put whatever you want here" OFF)
 message(STATUS "Frivolous variable = ${FRIVOLOUS}")
 
@@ -16,13 +17,18 @@ message("C compiler flags: ${CMAKE_C_FLAGS}")
 
 set(CMAKE_C_LANG_TIDY "clang-tidy;-checks=*")
 
+#]=]
+
 # The main program
 add_executable(lale src/lale.c)
 
-# Trivial binaries for testing purposes
-add_library(silly
-	SHARED
-		src/silly.c
+add_executable(executable 
+	       EXCLUDE_FROM_ALL
+	       samples/src/executable.c
 )
-add_executable(program src/trivial.c)
-target_link_libraries(program silly)
+
+add_library(library		SHARED
+	    EXCLUDE_FROM_ALL
+	    samples/src/library.c
+)
+
