@@ -81,8 +81,9 @@ exec_fmt_t detect_format(uint8_t * magic, size_t len)
 
 int main(int argc, char ** argv)
 {
-	FILE * target;
-	
+	FILE * target = NULL;
+	uint8_t * header = NULL;
+
 	if (argc < 2)
 	{
 		printf("Usage: %s <executable>\n", argv[0]);
@@ -101,6 +102,17 @@ int main(int argc, char ** argv)
 		return EXIT_FAILURE;
 	}
 
+    header = calloc(FORMAT_TRIAGE_LEN, sizeof(uint8_t);
+    // check for error
+
+    if (FORMAT_TRIAGE_LEN != fread(header, sizeof(uint8_t), FORMAT_TRIAGE_LEN, target)
+    {
+        perror("fread");
+        goto cleanup;
+    }
+    
+
+    /*
     uint32_t magic = 0;
     if (sizeof(uint32_t) != fread(&magic, sizeof(uint8_t), sizeof(uint32_t), target))
     {
@@ -131,8 +143,12 @@ int main(int argc, char ** argv)
          object.format,
          object.cpu_str,
          object.cpu);
+    */
 
+cleanup:
 	fclose(target);
+
+    free(header);
 
 	return EXIT_SUCCESS;
 }

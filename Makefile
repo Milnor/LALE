@@ -1,6 +1,7 @@
 BUILDDIR=build
 CCNATIVE=gcc
 SAMPLEEXEC=samples/src/executable.c
+SHELL:=/bin/bash
 
 # Cross Compilers
 CCARM=arm-linux-gnueabi-gcc
@@ -20,6 +21,10 @@ docker-start:
 	docker run -it --rm --name=lale \
 	 --mount type=bind,source=${PWD},target=/src lale/multiarch:0.1.0 \
 	 bash
+
+# Placeholders for executable formats I either don't have the hardware to
+#  compile or that don't exist yet
+fakes: hello_mac hello_she
 
 samples: hello_native64 hello_native32 hello_arm hello_mips hello_ppc hello_win
 
@@ -41,6 +46,15 @@ hello_native32: $(SAMPLEEXEC)
 hello_native64: $(SAMPLEEXEC)
 	mkdir -p $(BUILDDIR)
 	$(CCNATIVE) $(SAMPLEEXEC) -o $(BUILDDIR)/native64
+
+hello_mac:
+	mkdir -p $(BUILDDIR)
+	echo -en "\xfe\xed\xfa\xce" > $(BUILDDIR)/mac
+	dd bs=1 count=128 if=/dev/zero >> $(BUILDDIR)/mac
+
+hello_she:
+	echo -en "\x1a\x1eSHE" > $(BUILDDIR)/she
+	dd bs=1 count=128 if=/dev/zero >> $(BUILDDIR)/she
 
 .PHONY: clean
 clean:
