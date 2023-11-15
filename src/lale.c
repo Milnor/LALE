@@ -15,7 +15,7 @@
 #endif
 
 // move these to header
-exec_fmt_t detect_format(uint8_t * magic, size_t len);
+// exec_fmt_t detect_format(uint8_t * magic, size_t len);
 void parse_elf_ident(obj_fmt_t * object, FILE * target);
 
 void parse_elf_ident(obj_fmt_t * object, FILE * target)
@@ -58,7 +58,7 @@ void parse_elf_ident(obj_fmt_t * object, FILE * target)
             object->endian = '?';
     }
 }
-
+/*
 exec_fmt_t detect_format(uint8_t * magic, size_t len)
 {
     // TODO: add add'l formats
@@ -78,11 +78,43 @@ exec_fmt_t detect_format(uint8_t * magic, size_t len)
 
     return UNKNOWN;
 }
+*/
+
+int detect_format(uint8_t * header, obj_fmt_t * format)
+{
+
+    if (0 == memcmp(header, DOS_MAGIC, DOS_MAGIC_LEN)
+    {
+        // check PE too
+    }
+    else if (0 == memcmp(header, MACHO_MAGIC_BE32, DEFAULT_MAGIC_LEN)
+    {
+
+    } 
+    else if (0 == memcmp(header, MACHO_MAGIC_LE32, DEFAULT_MAGIC_LEN)
+    {
+
+    } 
+    else if (0 == memcmp(header, MACHO_MAGIC_BE64, DEFAULT_MAGIC_LEN)
+    {
+
+    } 
+    else if (0 == memcmp(header, MACHO_MAGIC_LE64, DEFAULT_MAGIC_LEN)
+    {
+
+    } 
+    else if (0 == memcmp(header, SHE_MAGIC, SHE_MAGIC_LEN)
+    {
+
+    }   
+}
 
 int main(int argc, char ** argv)
 {
+    int main_ret = EXIT_SUCCESS;
 	FILE * target = NULL;
 	uint8_t * header = NULL;
+    obj_fmt_t format_triage = {0};
 
 	if (argc < 2)
 	{
@@ -103,7 +135,11 @@ int main(int argc, char ** argv)
 	}
 
     header = calloc(FORMAT_TRIAGE_LEN, sizeof(uint8_t);
-    // check for error
+    if (NULL == header)
+    {
+        perror("calloc");
+        goto cleanup_no_header;
+    } 
 
     if (FORMAT_TRIAGE_LEN != fread(header, sizeof(uint8_t), FORMAT_TRIAGE_LEN, target)
     {
@@ -111,7 +147,17 @@ int main(int argc, char ** argv)
         goto cleanup;
     }
     
+    /* We've successfully read enough bytes to triage the executable format. */
 
+    int ret = detect_format(header, format_triage);
+    if (0 != ret)
+    {
+        print("[-] Failed to parse header of executable...\n");
+        main_ret = EXIT_FAILURE;
+        goto cleanup;
+    } 
+
+    print("[+] Detected a(n) %s executable.\n", );
     /*
     uint32_t magic = 0;
     if (sizeof(uint32_t) != fread(&magic, sizeof(uint8_t), sizeof(uint32_t), target))
@@ -150,5 +196,7 @@ cleanup:
 
     free(header);
 
-	return EXIT_SUCCESS;
+cleanup_no_header:
+
+	return main_ret;
 }
