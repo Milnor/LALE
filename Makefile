@@ -9,8 +9,13 @@ CCMIPS=mips-linux-gnu-gcc
 CCPPC=powerpc-linux-gnu-gcc
 CCWIN=x86_64-w64-mingw32-gcc
 
-hello:
-	echo "Hello, World"
+DOCKER_RUN_PARAMS=-it --rm --name=lale \
+	 --mount type=bind,source=${PWD},target=/src lale/multiarch:0.1.0
+
+lale:
+	docker run ${DOCKER_RUN_PARAMS} \
+		bash -c \ 
+		"cd src && cmake -S . -B $(BUILDDIR) && cmake --build $(BUILDDIR)"
 
 # Build the docker image
 docker-image: Dockerfile
@@ -18,9 +23,7 @@ docker-image: Dockerfile
 
 # Launch the docker container
 docker-start:
-	docker run -it --rm --name=lale \
-	 --mount type=bind,source=${PWD},target=/src lale/multiarch:0.1.0 \
-	 bash
+	docker run ${DOCKER_RUN_PARAMS}
 
 # Placeholders for executable formats I either don't have the hardware to
 #  compile or that don't exist yet
@@ -58,5 +61,8 @@ hello_she:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)
+	docker run ${DOCKER_RUN_PARAMS} \
+		bash -c \
+		"cd src && \
+		rm -rf $(BUILDDIR)"
 
