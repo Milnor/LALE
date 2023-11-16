@@ -10,20 +10,27 @@
 #define PE_MAGIC            "\x50\x45\x00\x00"      // "PE" + x0000
 #define SHE_MAGIC           "\x1a\x1e\x53\x48\x45"  // x1a1e + "SHE"
 
+#define PE_OFFSET           64  // end DOS Stub, begin PE header
+
 #define DEFAULT_MAGIC_LEN   4
 #define SHE_MAGIC_LEN       5
 #define DOS_MAGIC_LEN       2
 
 #define FORMAT_TRIAGE_LEN   84  // enough bytes for any executable header
 
+static const char * exec_name[] = { "unknown", "DOS", "ELF", "MAC", "PE", "SHE" };
+
 typedef enum
 {
-    UNKNOWN = -1,
+    UNKNOWN = 0,
+    DOS,
     ELF,
     MACHO,
     PE,
     SHE
 } exec_fmt_t;
+
+static const char * cpu_name[] = { "unknown", "ARM", "MIPS", "PPC", "x86"}
 
 typedef enum
 {

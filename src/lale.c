@@ -83,30 +83,52 @@ exec_fmt_t detect_format(uint8_t * magic, size_t len)
 int detect_format(uint8_t * header, obj_fmt_t * format)
 {
 
-    if (0 == memcmp(header, DOS_MAGIC, DOS_MAGIC_LEN)
+    if (0 == memcmp(header, DOS_MAGIC, DOS_MAGIC_LEN))
     {
-        // check PE too
+        if (0 == memcmp(&header[PE_OFFSET], PE_MAGIC, DEFAULT_MAGIC_LEN))
+        {
+            format->format = PE;
+        }
+        else
+        {
+            // unsupported for now
+            format->format = DOS;
+        }
     }
-    else if (0 == memcmp(header, MACHO_MAGIC_BE32, DEFAULT_MAGIC_LEN)
+    else if (0 == memcmp(header, MACHO_MAGIC_BE32, DEFAULT_MAGIC_LEN))
     {
-
+        format->arch_bits = 32;
+        format->endian = 'B';
+        format->format = MACHO;
     } 
-    else if (0 == memcmp(header, MACHO_MAGIC_LE32, DEFAULT_MAGIC_LEN)
+    else if (0 == memcmp(header, MACHO_MAGIC_LE32, DEFAULT_MAGIC_LEN))
     {
-
+        format->arch_bits = 32;
+        format->endian = 'L'
+        format->format = MACHO;
     } 
-    else if (0 == memcmp(header, MACHO_MAGIC_BE64, DEFAULT_MAGIC_LEN)
+    else if (0 == memcmp(header, MACHO_MAGIC_BE64, DEFAULT_MAGIC_LEN))
     {
-
+        format->arch_bits = 64;
+        format->endian = 'B'
+        format->format = MACHO;
     } 
-    else if (0 == memcmp(header, MACHO_MAGIC_LE64, DEFAULT_MAGIC_LEN)
+    else if (0 == memcmp(header, MACHO_MAGIC_LE64, DEFAULT_MAGIC_LEN))
     {
-
+        format->arch_bits = 64;
+        format->endian = 'L'
+        format->format = MACHO;
+    }
+    else if (0 == memcmp(header, ELF_MAGIC, DEFAULT_MAGIC_LEN))
+    {
+        format->format = ELF;
     } 
-    else if (0 == memcmp(header, SHE_MAGIC, SHE_MAGIC_LEN)
+    else if (0 == memcmp(header, SHE_MAGIC, SHE_MAGIC_LEN))
     {
-
+        format->format = SHE;
     }   
+
+    return 0;
 }
 
 int main(int argc, char ** argv)
@@ -134,14 +156,14 @@ int main(int argc, char ** argv)
 		return EXIT_FAILURE;
 	}
 
-    header = calloc(FORMAT_TRIAGE_LEN, sizeof(uint8_t);
+    header = calloc(FORMAT_TRIAGE_LEN, sizeof(uint8_t));
     if (NULL == header)
     {
         perror("calloc");
         goto cleanup_no_header;
     } 
 
-    if (FORMAT_TRIAGE_LEN != fread(header, sizeof(uint8_t), FORMAT_TRIAGE_LEN, target)
+    if (FORMAT_TRIAGE_LEN != fread(header, sizeof(uint8_t), FORMAT_TRIAGE_LEN, target))
     {
         perror("fread");
         goto cleanup;
@@ -149,15 +171,15 @@ int main(int argc, char ** argv)
     
     /* We've successfully read enough bytes to triage the executable format. */
 
-    int ret = detect_format(header, format_triage);
+    int ret = detect_format(header, &format_triage);
     if (0 != ret)
     {
-        print("[-] Failed to parse header of executable...\n");
+        printf("[-] Failed to parse header of executable...\n");
         main_ret = EXIT_FAILURE;
         goto cleanup;
     } 
 
-    print("[+] Detected a(n) %s executable.\n", );
+    printf("[+] Detected a(n) %s executable.\n", exec_name[format_triage.format]);
     /*
     uint32_t magic = 0;
     if (sizeof(uint32_t) != fread(&magic, sizeof(uint8_t), sizeof(uint32_t), target))
