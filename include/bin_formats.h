@@ -16,6 +16,11 @@
 #define SHE_MAGIC_LEN       5
 #define DOS_MAGIC_LEN       2
 
+/* See https://code.google.com/archive/p/corkami/wikis/PE.wiki */
+#define PE_X86_MACHINE      "\x4C\x01"  // both adjusted for LE
+#define PE_X64_MACHINE      "\x64\x86"
+#define PE_MACHINE_LEN      2
+
 #define FORMAT_TRIAGE_LEN   84  // enough bytes for any executable header
 
 static const char * exec_name[] = { "unknown", "DOS", "ELF", "MAC", "PE", "SHE" };
@@ -30,16 +35,17 @@ typedef enum
     SHE
 } exec_fmt_t;
 
-static const char * cpu_name[] = { "unknown", "ARM", "MIPS", "PPC", "x86"}
+static const char * cpu_name[] = { "unknown", "ARM", "MIPS", "PPC", "x86"};
 
 typedef enum
 {
-    OTHER = -1,
+    OTHER = 0,
     ARM,
     MIPS,
     PPC,
     X86
 } cpu_arch_t;
+
 
 /* Storing the string pointers is inefficient, but ergonomic */
 typedef struct

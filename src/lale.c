@@ -88,6 +88,23 @@ int detect_format(uint8_t * header, obj_fmt_t * format)
         if (0 == memcmp(&header[PE_OFFSET], PE_MAGIC, DEFAULT_MAGIC_LEN))
         {
             format->format = PE;
+            // Next two bytes after PE Header are machine type
+            if (0 == memcmp(&header[PE_OFFSET + DEFAULT_MAGIC_LEN], 
+                                    PE_X86_MACHINE, 
+                                    PE_MACHINE_LEN))
+            {
+                format->arch_bits = 32;
+                format->cpu = X86;
+                format->endian = 'L';
+            }
+            else if (0 == memcmp(&header[PE_OFFSET + DEFAULT_MAGIC_LEN],
+                                         PE_X64_MACHINE,
+                                         PE_MACHINE_LEN))
+            {
+                format->arch_bits = 64;
+                format->cpu = X86;
+                format->endian = 'L';
+            }
         }
         else
         {
@@ -104,19 +121,19 @@ int detect_format(uint8_t * header, obj_fmt_t * format)
     else if (0 == memcmp(header, MACHO_MAGIC_LE32, DEFAULT_MAGIC_LEN))
     {
         format->arch_bits = 32;
-        format->endian = 'L'
+        format->endian = 'L';
         format->format = MACHO;
     } 
     else if (0 == memcmp(header, MACHO_MAGIC_BE64, DEFAULT_MAGIC_LEN))
     {
         format->arch_bits = 64;
-        format->endian = 'B'
+        format->endian = 'B';
         format->format = MACHO;
     } 
     else if (0 == memcmp(header, MACHO_MAGIC_LE64, DEFAULT_MAGIC_LEN))
     {
         format->arch_bits = 64;
-        format->endian = 'L'
+        format->endian = 'L';
         format->format = MACHO;
     }
     else if (0 == memcmp(header, ELF_MAGIC, DEFAULT_MAGIC_LEN))
@@ -179,7 +196,11 @@ int main(int argc, char ** argv)
         goto cleanup;
     } 
 
-    printf("[+] Detected a(n) %s executable.\n", exec_name[format_triage.format]);
+    printf("[+] Detected a %d-bit, %cE, %s %s executable.\n", 
+        format_triage.arch_bits,
+        format_triage.endian,
+        cpu_name[format_triage.cpu],
+        exec_name[format_triage.format]);
     /*
     uint32_t magic = 0;
     if (sizeof(uint32_t) != fread(&magic, sizeof(uint8_t), sizeof(uint32_t), target))
